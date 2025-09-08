@@ -55,7 +55,7 @@ const displayAllplants = (allplants) => {
                 />
               </figure>
               <div class="card-body">
-                <h2 class="card-title">${plant.name}</h2>
+                <h2 onclick="loadModaldat(${plant.id})"  class="card-title">${plant.name}</h2>
                 <p class="text-gray-700 text-xs">
                   ${plant.description}
                 </p>
@@ -114,7 +114,7 @@ const displayBycatagories = (trees) => {
                 />
               </figure>
               <div class="card-body">
-                <h2 class="card-title">${tree.name}</h2>
+                <h2 onclick="loadModaldat(${tree.id})"  class="card-title">${tree.name}</h2>
                 <p class="text-gray-700 text-xs">
                   ${tree.description}
                 </p>
@@ -142,4 +142,37 @@ const displayBycatagories = (trees) => {
     // 5.appen child
     cardsDiv.appendChild(treesDiv);
   });
+};
+
+// modal for cards
+const loadModaldat = (id) => {
+  const url = `https://openapi.programming-hero.com/api/plant/${id}`;
+  fetch(url)
+    .then((res) => res.json())
+    .then((details) => displayModal(details.plants));
+};
+
+const displayModal = (plantInfo) => {
+  // 1.Get the container
+  const modalDiv = document.getElementById("modal-container");
+  // 2.set innerHTML
+  modalDiv.innerHTML = `
+  <div class="space-y-2 flex flex-col items-start">
+      <h1 class="font-bold text-lg">${plantInfo.name}</h1>
+      <img class="w-full max-h-[250px] rounded-lg" src="${plantInfo.image}" alt="" />
+      <h4 class="font-bold text-lg">
+        Category: <span class="text-gray-600 font-normal text-sm">${plantInfo.category}</span>
+      </h4>
+      <h4 class="font-bold text-lg">
+        Price: ৳<span class="text-gray-600 font-normal text-sm">${plantInfo.price}</span>
+      </h4>
+      <p class="font-bold text-lg">
+        Description:
+        <span class="text-gray-600 font-normal text-xs"
+          >${plantInfo.description}</span
+        >
+      </p>
+    </div>
+  `;
+  document.getElementById("plant_modal").showModal();
 };
