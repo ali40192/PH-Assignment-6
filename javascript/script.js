@@ -19,8 +19,8 @@ const displayData = (plants) => {
 
     // 2.set innerhtml
 
-    btnCatagories.innerHTML = `<button onclick="plantCatagories(${plant.id})"
-                  class="btn btn-soft btn-success py-2 hover:bg-[#15803D] text-black w-full hover:text-white"
+    btnCatagories.innerHTML = `<button id="click-Btn-${plant.id}" onclick="plantCatagories(${plant.id})"
+                  class="btn clk-btn btn-soft btn-success py-2 hover:bg-[#15803D] text-black w-full hover:text-white"
                 >
                   ${plant.category_name}
                   </button>
@@ -71,7 +71,7 @@ const displayAllplants = (allplants) => {
                 </div>
 
                 <div class="card-actions justify-end">
-                  <button
+                  <button onclick="dataUpdation(${plant.id})"
                     class="btn btn-primary w-full rounded-full bg-[#15803D]"
                   >
                     Add to Cart
@@ -90,11 +90,17 @@ loadAllplants();
 //plant by catagories//
 
 const plantCatagories = (id) => {
+  loadingFunc(true);
   const url = `https://openapi.programming-hero.com/api/category/${id}`;
-  console.log(url);
+
   fetch(url)
     .then((res) => res.json())
-    .then((data) => displayBycatagories(data.plants));
+    .then((data) => {
+      removeCls();
+      const clickBtn = document.getElementById(`click-Btn-${id}`);
+      clickBtn.classList.add("active");
+      displayBycatagories(data.plants);
+    });
 };
 
 const displayBycatagories = (trees) => {
@@ -130,7 +136,7 @@ const displayBycatagories = (trees) => {
                 </div>
 
                 <div class="card-actions justify-end">
-                  <button
+                  <button onclick="dataUpdation(${tree.id})"
                     class="btn btn-primary w-full rounded-full bg-[#15803D]"
                   >
                     Add to Cart
@@ -141,6 +147,7 @@ const displayBycatagories = (trees) => {
   `;
     // 5.appen child
     cardsDiv.appendChild(treesDiv);
+    loadingFunc(false);
   });
 };
 
@@ -175,4 +182,60 @@ const displayModal = (plantInfo) => {
     </div>
   `;
   document.getElementById("plant_modal").showModal();
+};
+
+const dataUpdation = (id) => {
+  const url = `https://openapi.programming-hero.com/api/plant/${id}`;
+  fetch(url)
+    .then((res) => res.json())
+    .then((datas) => displayUpdation(datas.plants));
+};
+
+const displayUpdation = (updates) => {
+  const updateContainer = document.getElementById("updates-container");
+  alert(`${updates.name} has been add to cart`);
+  const divOfnewcard = document.createElement("div");
+  divOfnewcard.innerHTML = `
+    <div
+               class="flex items-center bg-[#DCFCE7] justify-between rounded-md p-2 my-2"
+              >
+                <div>
+                  <h1 class="text-md font-bold">${updates.name}</h1>
+                  <h4>৳<span>${updates.price}</span></h4>
+                </div>
+                <button id="minus-btn" onclick="cutPrice(${updates.price})"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+    `;
+  updateContainer.appendChild(divOfnewcard);
+
+  const treePrice = `${updates.price}`;
+
+  const total = document.getElementById("add-price").innerText;
+
+  const currentTotal = Number(total) + Number(treePrice);
+  document.getElementById("add-price").innerText = currentTotal;
+};
+
+const cutPrice = (plantPrice) => {
+  const totalSum = document.getElementById("add-price").innerText;
+  const minus = Number(totalSum) - Number(plantPrice);
+  document.getElementById("add-price").innerText = minus;
+};
+
+// loading spiner
+
+const loadingFunc = (status) => {
+  if (status === true) {
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("plants-cards").classList.add("hidden");
+  } else {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("plants-cards").classList.remove("hidden");
+  }
+};
+
+// remove active class
+const removeCls = () => {
+  const clikbuttons = document.querySelectorAll(".clk-btn");
+  clikbuttons.forEach((btn) => btn.classList.remove("active"));
 };
