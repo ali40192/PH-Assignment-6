@@ -188,7 +188,9 @@ const dataUpdation = (id) => {
   const url = `https://openapi.programming-hero.com/api/plant/${id}`;
   fetch(url)
     .then((res) => res.json())
-    .then((datas) => displayUpdation(datas.plants));
+    .then((datas) => {
+      displayUpdation(datas.plants);
+    });
 };
 
 const displayUpdation = (updates) => {
@@ -196,14 +198,16 @@ const displayUpdation = (updates) => {
   alert(`${updates.name} has been add to cart`);
   const divOfnewcard = document.createElement("div");
   divOfnewcard.innerHTML = `
-    <div
+    <div id="minus-div-${updates.id}"
                class="flex items-center bg-[#DCFCE7] justify-between rounded-md p-2 my-2"
               >
                 <div>
                   <h1 class="text-md font-bold">${updates.name}</h1>
                   <h4>৳<span>${updates.price}</span></h4>
                 </div>
-                <button id="minus-btn" onclick="cutPrice(${updates.price})"><i class="fa-solid fa-xmark"></i></button>
+                <button id="minus-btn" onclick='cutPrice(${JSON.stringify(
+                  updates
+                )})'><i class="fa-solid fa-xmark"></i></button>
               </div>
     `;
   updateContainer.appendChild(divOfnewcard);
@@ -216,10 +220,14 @@ const displayUpdation = (updates) => {
   document.getElementById("add-price").innerText = currentTotal;
 };
 
-const cutPrice = (plantPrice) => {
+const cutPrice = (plantdetails) => {
+  console.log(plantdetails);
+
   const totalSum = document.getElementById("add-price").innerText;
-  const minus = Number(totalSum) - Number(plantPrice);
-  document.getElementById("add-price").innerText = minus;
+  const minusTotal = Number(totalSum) - Number(plantdetails.price);
+  document.getElementById("add-price").innerText = minusTotal;
+  const removeDiv = document.getElementById(`minus-div-${plantdetails.id}`);
+  removeDiv.remove();
 };
 
 // loading spiner
